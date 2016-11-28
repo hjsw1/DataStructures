@@ -416,19 +416,38 @@ public class BiTree<E extends Comparable<E>> {
 		swapChild(node.Rchild);
 	}
 	
+	public boolean isBST(TreeNode<E> node){
+		if(node == null){
+			return true;
+		}
+		if(node.Lchild != null && node.data.compareTo(node.Lchild.data) > 0 ){
+			return false;
+		}
+		if(node.Rchild != null && node.data.compareTo(node.Rchild.data) > 0){
+			return false;
+		}
+		return isBST(node.Lchild) && isBST(node.Rchild);
+	}
+	
+	
 	public static void main(String[] args) {
-		BiTree<Character> tree = BiTree.createBiTree("ABD###CE#G##FH##I##");
-		tree.levelOrder();
+//		BiTree<Character> tree = BiTree.createBiTree("ABD###CE#G##FH##I##");
+//		tree.levelOrder();
 		// tree.noRecPostOrderUseTag(tree.root);
 		// BiTree<Character> tree =
-		// BiTree.preInCreateBiTreeUseSubString("ABDCEGFHI", "DBAGECHFI");
+		BiTree<Character> tree = BiTree.preInCreateBiTreeUseSubString("ABDCEGFHI", "DBAGECHFI");
 		// tree.levelOrder();
 //		System.out.println("\n"+tree.countLeaf());
-		tree.swapChild();
+//		tree.swapChild();
+//		System.out.println();
+//		tree.levelOrder();
+		
+		tree.preOrder(tree.root);
 		System.out.println();
-		tree.levelOrder();
+		tree.inOrder(tree.root);
+		System.out.println();
+		tree.postOrder(tree.root);
 	}
-
 }
 
 class StackNode<E extends Comparable<E>> {

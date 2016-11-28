@@ -107,7 +107,7 @@ public class Sort {
 		}
 	}
 
-	public static <T extends Comparable<T>> void headpSort(T[] arr) {
+	public static <T extends Comparable<T>> void heapSort(T[] arr) {
 		T t = null;
 		for (int i = arr.length / 2; i >= 0; i--) {
 			maxHeap(arr, arr.length, i);// 建立大顶堆，每次调用都排序一棵二叉树，如果还有子树那么继续调整

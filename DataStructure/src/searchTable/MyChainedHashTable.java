@@ -16,7 +16,7 @@ public class MyChainedHashTable<E> {
 
 	@SuppressWarnings("unchecked")
 	public MyChainedHashTable(int size) {
-		value = new LinkedList[size];
+		value = new LinkedList[nextPrime(size)];
 		size = 0;
 	}
 
@@ -73,7 +73,25 @@ public class MyChainedHashTable<E> {
 		System.out.println();
 	}
 
+	private static boolean isPrime(int x){
+		for(int i = 2; i < x;++i){
+			if(x%i == 0){
+				return false;
+			}
+		}
+		return true;
+	}
 	
+	//返回给定x的下一个素数
+	private static int nextPrime(int x){
+		while(true){
+			if(isPrime(x)){
+				return x;
+			}
+			x++;
+		}
+	}
+
 	public static void main(String[] args) {
 		MyChainedHashTable<String> hashtable = new MyChainedHashTable<>();
 		Random r = new Random();

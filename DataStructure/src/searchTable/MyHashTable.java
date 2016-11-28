@@ -15,7 +15,7 @@ public class MyHashTable<E> {
 
 	@SuppressWarnings("unchecked")
 	public MyHashTable(int size) {
-		value = new Entry[size];
+		value = new Entry[nextPrime(size)];
 		size = 0;
 	}
 
@@ -62,7 +62,6 @@ public class MyHashTable<E> {
 		while (value[pos] != null && !value[pos].data.equals(data)) {
 			// 当没找到合适位置时
 			pos += 2 * delta - 1;
-//			pos += delta;
 			pos %= value.length;
 			delta++;
 		}
@@ -72,7 +71,7 @@ public class MyHashTable<E> {
 	@SuppressWarnings("unchecked")
 	private void rehash() {
 		Entry<E>[] oldValue = value;
-		value = new Entry[value.length * 2];
+		value = new Entry[nextPrime(value.length * 2)];
 		currentSize = 0;
 		for (int i = 0; i < oldValue.length; i++) {
 			if (oldValue[i] != null) {
@@ -90,6 +89,26 @@ public class MyHashTable<E> {
 		System.out.println();
 	}
 
+	private static boolean isPrime(int x){
+		for(int i = 2; i < x;++i){
+			if(x%i == 0){
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	//返回给定x的下一个素数
+	private static int nextPrime(int x){
+		while(true){
+			if(isPrime(x)){
+				return x;
+			}
+			x++;
+		}
+	}
+	
+	
 	// 静态内部类，可以在外部new出来，并且泛型与外部类无关
 	private static class Entry<E> {
 		E data;
@@ -103,6 +122,7 @@ public class MyHashTable<E> {
 			return "" + data;
 		}
 	}
+	
 	
 	public static void main(String[] args) {
 		MyHashTable<String> hashtable = new MyHashTable<>();
