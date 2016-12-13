@@ -377,7 +377,10 @@ public class BiTree<E extends Comparable<E>> implements Cloneable {
 		char[] in = inStr.toCharArray();
 		return new BiTree<>(createSubTree(pre, in, 0, 0, pre.length));
 	}
-
+	
+	/**
+	 * 这个算法很垃圾
+	 */
 	private static TreeNode<Character> createSubTree(char[] pre, char[] in, int preStart, int inStart, int size) {
 		if (size == 0) {
 			return null;
@@ -434,7 +437,6 @@ public class BiTree<E extends Comparable<E>> implements Cloneable {
 		}
 		printBiTreePath(root);
 		pathList.clear();
-		;
 	}
 
 	private void printBiTreePath(TreeNode<E> node) {
@@ -468,7 +470,7 @@ public class BiTree<E extends Comparable<E>> implements Cloneable {
 				stkPtr = new StackNode<>(subTree, 0);
 				stack.push(stkPtr);
 				subTree = subTree.Lchild;
-			}
+			} 
 			// 向左移动，并压栈
 			stkPtr = stack.pop();
 			subTree = stkPtr.ptr;
@@ -516,7 +518,7 @@ public class BiTree<E extends Comparable<E>> implements Cloneable {
 	public static BiTree<Character> preInCreateBiTreeUseSubString(String pre, String in) {
 		return new BiTree<Character>(createSubTreeUseSubString(pre, in));
 	}
-
+      
 	// 这个算法更好，不使用下标，直接取子串
 	private static TreeNode<Character> createSubTreeUseSubString(String pre, String in) {
 		TreeNode<Character> subTree = null;
@@ -530,7 +532,6 @@ public class BiTree<E extends Comparable<E>> implements Cloneable {
 		}
 		return subTree;
 	}
-
 }
 
 class StackNode<E extends Comparable<E>> {

@@ -66,14 +66,14 @@ public class BiThreadTree<E extends Comparable<E>> {
 		}
 	}
 	
-	
+	//这个算法更简洁一些
 	ThreadTreeNode<E> first(ThreadTreeNode<E> node){
 		while (node.LTag == PointerTag.Link) {
 			node = node.Lchild;
 		}
 		return node;
 	}
-	
+	 
 	ThreadTreeNode<E> next(ThreadTreeNode<E> node){
 		ThreadTreeNode<E> ptr = node.Rchild;
 		if(ptr == head){
@@ -107,10 +107,7 @@ public class BiThreadTree<E extends Comparable<E>> {
 		if (root == null) {
 			head.Lchild = head;
 		} else {
-			head.Lchild = root;
-			pre = head;
-			// pre初始值为head，方便将第一个结点的左指针域设为head
-			inThreading(root);
+			// pre初始值为hefyyy
 			// 线索化结束后pre指向最后一个结点
 			pre.RTag = PointerTag.Thread;
 			pre.Rchild = head;

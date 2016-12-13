@@ -48,15 +48,15 @@ public class Sort {
 		int movIdx = 0;// 移动时候的索引
 		T guard = null;
 		// 增量从长度的一半开始，最终会减到1，减到0时结束
-		for (int increment = arr.length / 2; increment > 0; increment /= 2) {
-			for (int i = increment; i < arr.length; i++) {
+		for (int inc = arr.length / 2; inc > 0; inc /= 2) {
+			for (int i = inc; i < arr.length; i++) {
 				// i从第一组的第二个元素（第一个与第二个相差增量）开始
-				if (arr[i].compareTo(arr[i - increment]) < 0) {// 后面的比前面的小，需要插入
+				if (arr[i].compareTo(arr[i - inc]) < 0) {// 后面的比前面的小，需要插入
 					guard = arr[i];// 待插入元素
-					for (movIdx = i - increment; movIdx >= 0 && guard.compareTo(arr[movIdx]) < 0; movIdx -= increment) {
-						arr[movIdx + increment] = arr[movIdx];
+					for (movIdx = i - inc; movIdx >= 0 && guard.compareTo(arr[movIdx]) < 0; movIdx -= inc) {
+						arr[movIdx + inc] = arr[movIdx];
 					} // 跳跃式的移动
-					arr[movIdx + increment] = guard;
+					arr[movIdx + inc] = guard;
 				}
 			}
 		}
@@ -110,38 +110,34 @@ public class Sort {
 	public static <T extends Comparable<T>> void heapSort(T[] arr) {
 		T t = null;
 		for (int i = arr.length / 2; i >= 0; i--) {
-			maxHeap(arr, arr.length, i);// 建立大顶堆，每次调用都排序一棵二叉树，如果还有子树那么继续调整
+			filterDown(arr, arr.length, i);// 建立大顶堆，每次调用都排序一棵二叉树，如果还有子树那么继续调整
 		}
 		for (int i = arr.length - 1; i >= 1; i--) {
 			t = arr[0];
 			arr[0] = arr[i];
 			arr[i] = t;
-			maxHeap(arr, i, 0);// 先将堆顶元素与堆的无序区的最后一个元素交换，然后重新调整为堆(每次循环后都实现了一个元素的有序，因此调整的范围减一)
+			filterDown(arr, i, 0);// 先将堆顶元素与堆的无序区的最后一个元素交换，然后重新调整为堆(每次循环后都实现了一个元素的有序，因此调整的范围减一)
 		}
 	}
 
-	private static <T extends Comparable<T>> void maxHeap(T[] arr, int heapSize, int root) {
-		T t = null;
-		int Lchild = root * 2 + 1;
-		int Rchild = root * 2 + 2;
-		// Lchild和Rchild指向head指向元素的左右子树
-		int maxIndex = root;
-		// maxIndex指向根节点和左右孩子结点中的最大值
-		if (Lchild < heapSize && arr[Lchild].compareTo(arr[maxIndex]) > 0) {
-			maxIndex = Lchild;
+	private static <T extends Comparable<T>> void filterDown(T[] data, int size, int root) {
+		T e = data[root];
+		int child = 0;
+		while ((root * 2 + 1 ) < size) {//当存在左孩子时
+			child = root * 2 + 1;
+			//如果还有右孩子，则比较左孩子和右孩子
+			if ((child + 1) < size && data[child].compareTo(data[child + 1]) < 0) {
+				child++;
+			}
+			// child指向左右孩子较大的
+			if (e.compareTo(data[child]) > 0) {
+				break;// 符合大顶堆的规则，直接退出
+			} else {
+				data[root] = data[child];
+				root = child;// 继续向下调整
+			}
 		}
-		if (Rchild < heapSize && arr[Rchild].compareTo(arr[maxIndex]) > 0) {
-			maxIndex = Rchild;
-		}
-		if (maxIndex != root) {
-			// 交换，将根节点和左右子树中的最大值赋给根节点
-			t = arr[maxIndex];
-			arr[maxIndex] = arr[root];
-			arr[root] = t;
-			// 如果当前二叉树的调整影响了左右子树的子树，那么继续调整
-			// 交换的是左子树就调整左子树的子树，交换的是右子树就调整右子树的子树
-			maxHeap(arr, heapSize, maxIndex);
-		}
+		data[root] = e;
 	}
 
 	// 实现从low至high的排序
@@ -150,7 +146,7 @@ public class Sort {
 		if (low < high) {
 			mergeSort(arr, low, mid);
 			mergeSort(arr, mid + 1, high);
-			merge(arr,low,mid,high);
+			merge(arr, low, mid, high);
 		}
 	}
 
@@ -183,48 +179,50 @@ public class Sort {
 			mergeIndex++;
 			right++;
 		}
-		//将归并数组中的元素复制回原数组，注意二者下标是相同的
-		while(low <= high){
+		// 将归并数组中的元素复制回原数组，注意二者下标是相同的
+		while (low <= high) {
 			arr[low] = mergeArr[low];
 			low++;
 		}
 	}
-	//基数排序，radix是基数（关键字个数），digit是数字的最高位数
-	//仅能用来给数字排序
-	public static void radixSort(int [] arr,int radix,int digit){
-		int[] count = new int[radix];//用于计算每个基数对应的各个元素所占bucket的索引位置
-		int[] bucket = new int[arr.length];//用于存放一趟排序之后的数据
-		int rate = 1;//rate是用来求数据的基数用的
-		int key = 0;//key是用来保存基数的
+
+	// 基数排序，radix是基数（关键字个数），digit是数字的最高位数
+	// 仅能用来给数字排序
+	public static void radixSort(int[] arr, int radix, int digit) {
+		int[] count = new int[radix];// 用于计算每个基数对应的各个元素所占bucket的索引位置
+		int[] bucket = new int[arr.length];// 用于存放一趟排序之后的数据
+		int rate = 1;// rate是用来求数据的基数用的
+		int key = 0;// key是用来保存基数的
 		for (int d = 1; d <= digit; d++) {
 			for (int i = 0; i < count.length; i++) {
 				count[i] = 0;
-			}//每次遍历前清空count数组
-			//对数组中的数据的基数进行计数，得到每个基数的元素个数，为计算存放它们的下表（右边界）做准备
+			} // 每次遍历前清空count数组
+				// 对数组中的数据的基数进行计数，得到每个基数的元素个数，为计算存放它们的下表（右边界）做准备
 			for (int i = 0; i < bucket.length; i++) {
-				key = arr[i]/rate % radix;//key就是arr【i】这个元素的倒数第d位的值
+				key = arr[i] / rate % radix;// key就是arr【i】这个元素的倒数第d位的值
 				count[key]++;
 			}
 			for (int i = 1; i < count.length; i++) {
-				count[i] += count[i-1];//得到每个基数存放的右界，基数为i存放在count[i]~count[i+1]-1处
+				count[i] += count[i - 1];// 得到每个基数存放的右界，基数为i存放在count[i]~count[i+1]-1处
 			}
-			//为了保持排序的稳定性（比如十位排序后保持十位相同时个位的顺序），从后往前排序
-			for (int i = arr.length-1; i >= 0 ; i--) {
-				key = arr[i]/rate % radix;
-				bucket[count[key]-1] = arr[i];
+			// 为了保持排序的稳定性（比如十位排序后保持十位相同时个位的顺序），从后往前排序
+			for (int i = arr.length - 1; i >= 0; i--) {
+				key = arr[i] / rate % radix;
+				bucket[count[key] - 1] = arr[i];
 				count[key]--;
 			}
-			//将bucket暂存的数据重新赋回arr
+			// 将bucket暂存的数据重新赋回arr
 			for (int i = 0; i < arr.length; i++) {
 				arr[i] = bucket[i];
 			}
-			rate*=10;//如果这次是个位，那么下次就是十位，rate*10
+			rate *= 10;// 如果这次是个位，那么下次就是十位，rate*10
 		}
 	}
 
 	public static void main(String[] args) {
-		int[] arr = {  50, 123, 543, 187, 49, 30, 0, 2, 11, 100 };
-		Sort.radixSort(arr,10,3);
+		Integer[] arr = { 50, 123, 543, 187, 49, 30, 0, 2, 11, 100 };
+		// Sort.radixSort(arr,10,3);
+		Sort.heapSort(arr);
 		System.out.println(Arrays.toString(arr));
 	}
 }

@@ -225,7 +225,6 @@ public class MyDoubleLinkedList<E> implements MyList<E> {
 			E e = node.data;
 			node.prev.next = node.next;
 			node.next.prev = node.prev;
-			node = null;
 			return e;
 		}
 	}

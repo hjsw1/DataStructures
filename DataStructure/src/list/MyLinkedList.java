@@ -206,7 +206,6 @@ public class MyLinkedList<E> implements MyList<E> {
 		}
 		E e = tail.data;
 		node.next = null;
-		tail = null;
 		tail = node;
 		return e;
 	}

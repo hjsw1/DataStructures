@@ -35,7 +35,7 @@ public class Tree<E> {
 			return (depthOfChild + 1) > depthOfSibling ? depthOfChild + 1 : depthOfSibling;
 		}
 	}
-
+	
 	// 输出树/森林（转为了二叉树之后）从根结点到每个叶子结点的路径
 	// 区别在于两点
 	// 第一，当前结点为叶子结点只需要其左指针域为空即可，不需要右指针域为空，因为右指针域表示的是其兄弟
@@ -46,7 +46,6 @@ public class Tree<E> {
 		}
 		printTreePath(root);
 		pathList.clear();
-		;
 	}
 
 	// 递归+循环

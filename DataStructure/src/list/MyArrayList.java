@@ -148,6 +148,7 @@ public class MyArrayList<E> implements MyList<E>{
 			System.out.print(value[i]+(i==elements-1?"]\n":","));
 		}
 	}
+	
 	public  void sort(Comparator<E> comp){
 		int k = 0;
 		for (int i = 0; i < value.length-1; i++) {

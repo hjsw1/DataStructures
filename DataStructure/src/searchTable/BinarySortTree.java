@@ -8,6 +8,7 @@ import java.util.Random;
  * @author New Song
  *
  */
+
 public class BinarySortTree<E extends Comparable<E>> {
 	private BiSortTreeNode<E> root;
 	
@@ -103,7 +104,7 @@ public class BinarySortTree<E extends Comparable<E>> {
 		}
 		return node;
 	}
-
+	
 	public BiSortTreeNode<E> root() {
 		return this.root;
 	}
@@ -145,6 +146,7 @@ public class BinarySortTree<E extends Comparable<E>> {
 		tree.inOrder(tree.root());
 	}
 }
+
 class BiSortTreeNode<E extends Comparable<E>> {
 	E data;
 	BiSortTreeNode<E> Lchild;

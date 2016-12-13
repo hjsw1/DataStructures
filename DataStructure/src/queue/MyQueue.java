@@ -46,6 +46,7 @@ public class MyQueue<E> {
 		if (isEmpty())
 			return null;
 		Object obj = value[front];
+		value[front] = null;
 		front = (front + 1) % value.length;
 		elements--;
 		return (E)obj;

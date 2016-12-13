@@ -1,7 +1,5 @@
 package searchTable;
 
-import java.util.Random;
-
 public class AVLTree<E extends Comparable<E>> {
 	private AVLTreeNode<E> root;
 
@@ -68,7 +66,6 @@ public class AVLTree<E extends Comparable<E>> {
 		parent.Rchild = rotateWithLeftChild(parent.Rchild);
 		return rotateWithRightChild(parent);
 	}
-
 	// 将以上各种情况统一起来
 	private AVLTreeNode<E> rotate(AVLTreeNode<E> node) {
 		if(node == null){
