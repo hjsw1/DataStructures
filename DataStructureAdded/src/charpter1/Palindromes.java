@@ -17,6 +17,4 @@ public class Palindromes {
 		System.out.println(Palindromes.isPalin("stats", 0));
 		System.out.println(Palindromes.isPalin("Madam, I'm Adam"));
 	}
-	
-	
 }

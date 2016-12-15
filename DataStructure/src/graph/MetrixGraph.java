@@ -88,9 +88,10 @@ class Vertex<E extends Comparable<E>> {
  */
 public class MetrixGraph<E extends Comparable<E>> {
 	public static final int MAX_VERTEX_NUM = 20;
-	private static final int infinity = java.lang.Integer.MAX_VALUE;// 表示网中的无限
+	public static final int infinity = java.lang.Integer.MAX_VALUE;// 表示网中的无限
 	private static final int hasJoined = 0;
 	private static final int noVisited = -1;
+	
 	private List<Vertex<E>> vexs; // 顶点
 	private ArcCell[][] arcs; // 邻接矩阵
 	private int vexNum, arcNum; // 图的当前顶点数和弧数
@@ -111,10 +112,12 @@ public class MetrixGraph<E extends Comparable<E>> {
 		this.vexs = new ArrayList<>(MAX_VERTEX_NUM);
 		this.arcs = new ArcCell[MAX_VERTEX_NUM][MAX_VERTEX_NUM];
 		this.visited = new boolean[MAX_VERTEX_NUM];
+		
 		this.visitOrder = new int[MAX_VERTEX_NUM];
 		this.low = new int[MAX_VERTEX_NUM];
 		this.closedge = new ArrayList<>(MAX_VERTEX_NUM);
 		this.degree = new int[MAX_VERTEX_NUM];
+		
 		this.kind = kind;
 		this.vexNum = vexNum;
 		this.arcNum = arcNum;

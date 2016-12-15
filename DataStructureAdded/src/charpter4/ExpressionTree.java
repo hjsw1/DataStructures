@@ -106,7 +106,7 @@ public class ExpressionTree {
 	}
 
 	public static void main(String[] args) {
-		/*String exp = "(a+b)*c-d/e#";
+		String exp = "(a+b)*c-d/e#";
 		
 		// 所有的表达式要求以#结束
 		BiTree<Character> tree = ExpressionTree.createTreeUseInOrderExpression(exp);
@@ -116,9 +116,9 @@ public class ExpressionTree {
 		System.out.println();
 		tree.postOrder(tree.root());
 		
-		*/
+		
 		String post = "cab+*de/-";
-		BiTree<Character> tree = ExpressionTree.createTreeUsePostOrderExpression(post);
-		tree.inOrder(tree.root());
+		BiTree<Character> tree2 = ExpressionTree.createTreeUsePostOrderExpression(post);
+		tree.inOrder(tree2.root());
 	}
 }

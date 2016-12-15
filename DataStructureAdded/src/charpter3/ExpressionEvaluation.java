@@ -76,18 +76,6 @@ public class ExpressionEvaluation {
 	}
 	
 	
-	public static void main(String[] args) {
-		String infix = "(a+b)*(c-e^f)/d";
-		Calculator calc = new Calculator();
-		Map<Character,Double> params = new HashMap<>();
-		params.put('a', 3.0);
-		params.put('b', 1.0);
-		params.put('c', 5.0);
-		params.put('d', 2.0);
-		params.put('e', 3.0);
-		params.put('f', 2.0);
-		calc.run(ExpressionEvaluation.toPostfix(infix), params);
-	}
 }
 
 /**
@@ -118,7 +106,6 @@ class Calculator{
 				break;
 			//处理操作数
 			default:
-//				System.out.println("Map:"+ch);
 				addOperand(params.get(ch));
 				break;
 			}
@@ -170,5 +157,17 @@ class Calculator{
 			break;
 		}
 		stack.push(result);
+	}
+	public static void main(String[] args) {
+		String infix = "(a+b)*(c-e^f)/d";
+		Calculator calc = new Calculator();
+		Map<Character,Double> params = new HashMap<>();
+		params.put('a', 3.0);
+		params.put('b', 1.0);
+		params.put('c', 5.0);
+		params.put('d', 2.0);
+		params.put('e', 3.0);
+		params.put('f', 2.0);
+		calc.run(ExpressionEvaluation.toPostfix(infix), params);
 	}
 }

@@ -37,6 +37,7 @@ public class PermutationSelectR {
 		test.calculate(5, 3);
 	}
 }
+
 /*
 1 2 3
 1 2 4

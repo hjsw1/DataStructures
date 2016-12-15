@@ -3,14 +3,33 @@ package sort;
 import java.util.Arrays;
 
 public class Sort {
+	
+	public static <T extends Comparable<T>> void bubbleSort(T []arr){
+		boolean hasSorted = true;
+		T temp = null;
+		for(int i = 0 ; i< arr.length-1; i++){
+			hasSorted = true;
+			for(int j = 0 ; j <arr.length-1-i;j++){
+				if(arr[j].compareTo(arr[j+1]) > 0){
+					hasSorted = false;
+					temp = arr[j];
+					arr[j] = arr[j+1];
+					arr[j+1] = temp;
+				}
+			}
+			if(hasSorted){
+				break;
+			}
+		}
+	}
 
 	public static <T extends Comparable<T>> void insertSort(T[] arr) {
 		int sortedIndex = 0;
 		T guard = null;
 		for (int unSortedIndex = 1; unSortedIndex < arr.length; unSortedIndex++) {
-			// i从无序区的第一个元素开始(默认开始时因为只有一个元素，所以第一个元素是有序的)
+			// unSortedIndex从无序区的第一个元素开始(默认开始时因为只有一个元素，所以第一个元素是有序的)
 			guard = arr[unSortedIndex];// 将无序区的第一个元素放在岗哨中
-			sortedIndex = unSortedIndex - 1; // j是有序区的最后一个元素
+			sortedIndex = unSortedIndex - 1; // sortedIndex是有序区的最后一个元素
 			while (sortedIndex >= 0 && arr[sortedIndex].compareTo(guard) > 0) {
 				// 如果有序区的最后一个元素比岗哨大，那么后移，直到岗哨找到适合它的位置为止
 				arr[sortedIndex + 1] = arr[sortedIndex];
@@ -196,15 +215,16 @@ public class Sort {
 		for (int d = 1; d <= digit; d++) {
 			for (int i = 0; i < count.length; i++) {
 				count[i] = 0;
-			} // 每次遍历前清空count数组
-				// 对数组中的数据的基数进行计数，得到每个基数的元素个数，为计算存放它们的下表（右边界）做准备
+			} 
+			// 每次遍历前清空count数组
+			// 对数组中的数据的基数进行计数，得到每个基数的元素个数，为计算存放它们的下表（右边界）做准备
 			for (int i = 0; i < bucket.length; i++) {
 				key = arr[i] / rate % radix;// key就是arr【i】这个元素的倒数第d位的值
 				count[key]++;
 			}
 			for (int i = 1; i < count.length; i++) {
 				count[i] += count[i - 1];// 得到每个基数存放的右界，基数为i存放在count[i]~count[i+1]-1处
-			}
+			} 
 			// 为了保持排序的稳定性（比如十位排序后保持十位相同时个位的顺序），从后往前排序
 			for (int i = arr.length - 1; i >= 0; i--) {
 				key = arr[i] / rate % radix;
@@ -215,14 +235,14 @@ public class Sort {
 			for (int i = 0; i < arr.length; i++) {
 				arr[i] = bucket[i];
 			}
-			rate *= 10;// 如果这次是个位，那么下次就是十位，rate*10
+			rate *= radix;// 如果这次是个位，那么下次就是十位，rate*radix
 		}
 	}
 
 	public static void main(String[] args) {
-		Integer[] arr = { 50, 123, 543, 187, 49, 30, 0, 2, 11, 100 };
-		// Sort.radixSort(arr,10,3);
-		Sort.heapSort(arr);
+		int [] arr = { 50, 123, 543, 187, 49, 30, 0, 2, 11, 100 };
+		Sort.radixSort(arr,10,3);
+//		Sort.heapSort(arr);
 		System.out.println(Arrays.toString(arr));
 	}
 }

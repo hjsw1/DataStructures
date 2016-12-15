@@ -35,12 +35,14 @@ public class PolynomialArrayImpl {
 			return term;
 		}
 	}
+	
 	public void clear(){
 		for(int i = 0; i < MAX_DEGREE;i++){
 			poly[i] = 0;
 		}
 		highPower = 0;
 	}
+	
 	public PolynomialArrayImpl add(PolynomialArrayImpl rhs){
 		PolynomialArrayImpl sum = new PolynomialArrayImpl();
 		sum.highPower = highPower > rhs.highPower ? highPower:rhs.highPower;

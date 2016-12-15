@@ -48,18 +48,36 @@ public class L1OPL2 {
 		}
 		return l3;
 	}
-	public static <E extends Comparable<E>> MyLinkedList<E> reverse(MyLinkedList<E> list){
+	
+	public static <E extends Comparable<E>> MyLinkedList<E> reverseAndCopy(MyLinkedList<E> list){
 		MyLinkedList<E> res = new MyLinkedList<>();
-		Node<E> src = list.head,node = new Node<>(src.data,null);//node是前面一个，post是后面一个，将其位置倒过来
+		Node<E> pSrc = list.head,pRes = new Node<>(pSrc.data,null);//node锟斤拷前锟斤拷一锟斤拷锟斤拷post锟角猴拷锟斤拷一锟斤拷锟斤拷锟斤拷锟斤拷位锟矫碉拷锟斤拷锟斤拷
 		Node<E> post = null;
-		while(src.next != null){
-			src = src.next;
-			post = new Node<>(src.data,node);
-			node = post;
+		while(pSrc.next != null){
+			pSrc = pSrc.next;
+			post = new Node<>(pSrc.data,pRes);
+			pRes = post;
 		}
 		res.head = post;
 		return res;
 	}
+	
+	
+	public static <E extends Comparable<E>> MyLinkedList<E> reverse(MyLinkedList<E> list){
+		Node<E> curr = list.head;
+		Node<E> post = curr.next,pre = null;//pre存放当前结点的上一个结点
+		while(post != null){
+			curr.next = pre;
+			pre = curr;
+			curr = post;
+			post = post.next;//下一个
+		}
+
+		curr.next = pre;
+		list.head = curr;
+		return list;
+	}
+	
 	
 	public static void main(String[] args) {
 		MyLinkedList<Integer> l1 = new MyLinkedList<>();
@@ -80,8 +98,13 @@ public class L1OPL2 {
 //		l3.traverse();
 //		l3 = union(l1,l2);
 //		l3.traverse();
+//		l3 = reverseAndCopy(l1);
+//		l3.traverse();
+		l1.traverse();
+		
 		l3 = reverse(l1);
 		l3.traverse();
+		
 	}
 }
 
@@ -105,7 +128,7 @@ class MyLinkedList<E extends Comparable<E>> {
 		Node<E> node = head;
 		System.out.print("[");
 		while (node != null) {
-			System.out.print(node.data + (node == tail ? "" : ","));
+			System.out.print(node.data + (node.next == null ? "" : ","));
 			node = node.next;
 		}
 		System.out.println("]");

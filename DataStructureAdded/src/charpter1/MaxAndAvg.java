@@ -9,7 +9,7 @@ public class MaxAndAvg {
 			return t > arr[n] ? t:arr[n];
 		}
 	}
-	//n为最大下标
+	
 	public double average(int[] arr, int n) {
 		if(n == 0){
 			return arr[0];

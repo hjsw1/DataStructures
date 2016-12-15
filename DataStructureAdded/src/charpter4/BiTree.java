@@ -1,20 +1,16 @@
 package charpter4;
 
 import java.util.ArrayDeque;
+import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Stack;
 
-/**
- * Java实现二叉查找树 使用递归的操作一般设置两个方法，一个方法是public的（用于调用的），一个方法是private（实际递归的）
- * 
- * @author New Song
- *
- */
-
-public class BiTree<E extends Comparable<E>> {
+public class BiTree<E extends Comparable<E>> implements Cloneable {
 	private TreeNode<E> root;
 	private static int index = -1;
 	// 用于使用先序遍历字符串建树
+	private LinkedList<TreeNode<E>> pathList;
+	// 用于输出从根节点到各个叶子结点的所有路径
 
 	public BiTree() {
 	}
@@ -23,121 +19,6 @@ public class BiTree<E extends Comparable<E>> {
 		this.root = root;
 	}
 
-	// 在node结点下创建子树，node初始值为root，在查找过程中变为root的子节点
-	// 如果root为空，那么root的值为data
-	// 否则就向下查找，直至找到合适的位置，创建新结点，赋值为data
-	// 不存在node的值等于data的情况，如果相等就没有插入的必要了
-	public void createBiTree(TreeNode<E> node, E data) {
-		if (root == null) {
-			root = new TreeNode<E>(data);
-		} else {
-			if (data.compareTo(node.data) < 0) {
-				if (node.Lchild == null) {
-					node.Lchild = new TreeNode<E>(data);
-				} else {
-					createBiTree(node.Lchild, data);
-				}
-			} else {
-				if (node.Rchild == null) {
-					node.Rchild = new TreeNode<E>(data);
-				} else {
-					createBiTree(node.Rchild, data);
-				}
-			}
-		}
-	}
-
-	// 插入一个结点
-	public void insert(E data) {
-		root = insert(root, data);
-		// 注意结果要赋值，否则在调完第二个insert方法后node就回收了，没有把结果赋给root
-		// 调用的时候将一个null赋给了node，即使node后来不为null了也没法把引用重新赋给root
-	}
-
-	// 也是需要递归进行查找的，递归地找到合适位置后插入，不允许有重复元素
-	private TreeNode<E> insert(TreeNode<E> node, E data) {
-		if (node == null) {
-			node = new TreeNode<E>(data);
-		} else {
-			if (data.compareTo(node.data) < 0) {
-				node.Lchild = insert(node.Lchild, data);
-			} else if (data.compareTo(node.data) > 0) {
-				node.Rchild = insert(node.Rchild, data);
-			}
-		}
-		return node;
-	}
-
-	public TreeNode<E> search(E data) {
-		return search(root, data);
-	}
-
-	// 查找一个结点，使用递归
-	// 如果data即为当前结点的值，则返回当前结点
-	// 如果data小于当前结点，那么递归查找当前结点的左子树
-	// 否则，递归查找当前结点的右子树
-	private TreeNode<E> search(TreeNode<E> node, E data) {
-		if (node == null) {
-			return null;
-		}
-		int res = data.compareTo(node.data);
-		if (res > 0) {
-			return search(node.Rchild, data);
-		} else if (res < 0) {
-			return search(node.Lchild, data);
-		} else {
-			return node;
-		}
-	}
-
-	// 删除一个结点
-	public void delete(E data) {
-		root = delete(root, data);
-	}
-
-	private TreeNode<E> delete(TreeNode<E> node, E data) {
-		if (node == null) {
-			return null;
-		}
-		int res = data.compareTo(node.data);
-		if (res > 0) {
-			node.Rchild = delete(node.Rchild, data);
-		} else if (res < 0) {
-			node.Lchild = delete(node.Lchild, data);
-			// 删除一个结点不仅包括将自己赋为null，而且其父节点也要将其左子树/右子树赋为null
-			// 以下为找到的情况
-			// 如果找到的结点既没有左子树又没有右子树，那么直接设为null
-			// 如果只有左子树或只有右子树，那么将当前结点赋值为不为空的那一个子树
-			// 如果都有，那么找到当前结点的右子树中值最小的那个结点，删除它（因为它一定没有左子树，所以采用第二种删除策略即可）
-			// 然后将当前结点赋值为最小值
-		} else if (node.Lchild != null && node.Rchild != null) {
-			node.data = findMin(node.Rchild).data;
-			node.Rchild = delete(node.Rchild, node.data);
-			// 进行一次删除，删除的是以node的右子树为根节点，值为min的这个结点
-			// 包含了结点只有左子树或右子树或都没有的情况
-		} else {
-			node = node.Lchild == null ? node.Rchild : node.Lchild;
-		}
-		return node;
-	}
-
-	// 返回当前子树中的值最小的那个结点
-	private TreeNode<E> findMin(TreeNode<E> node) {
-		if (node == null) {
-			return null;
-		}
-		if (node.Lchild != null) {
-			return findMin(node.Lchild);
-		} else {
-			return node;
-		}
-	}
-
-	public boolean isEmpty() {
-		return root == null;
-	}
-
-	// 后序遍历二叉树的深度
 	public int depth() {
 		return depth(root);
 	}
@@ -150,17 +31,89 @@ public class BiTree<E extends Comparable<E>> {
 			int Ldepth = depth(subTree.Lchild);
 			int Rdepth = depth(subTree.Rchild);
 			return Ldepth > Rdepth ? (Ldepth + 1) : (Rdepth + 1);
-			// 这种情况实际上包含了两种情况：一种是叶子结点，此时返回的是1；另一种是非叶子结点，返回的是较深子树的深度+1
-			// 综合起来就是每遇到叶子结点，深度就加1，得到子树的深度，最后加上根节点的深度1
-			/*
-			 * }else if(subTree.Lchild == null || subTree.Rchild == null){
-			 * return 1; }
-			 */
 		}
+	}
+
+	// 二叉树的结点个数
+	public int size() {
+		return size(root);
+	}
+
+	private int size(TreeNode<E> subTree) {
+		if (subTree == null) {
+			return 0;
+		} else {
+			int Lsize = size(subTree.Lchild);
+			int Rsize = size(subTree.Rchild);
+			return Lsize + Rsize + 1;
+		}
+	}
+
+	public TreeNode<E> parent(TreeNode<E> element) {
+		if (element == null) {
+			return null;
+		}
+		return parent(root, element);
+	}
+
+	// 第一个参数subTree是指该结点之下进行搜索，第二个参数element是要找父节点的子节点
+	private TreeNode<E> parent(TreeNode<E> subTree, TreeNode<E> element) {
+		TreeNode<E> parent;
+		if (subTree == null) {
+			return null;
+		} else {
+			if (subTree.Lchild == element || subTree.Rchild == element) {
+				return subTree;
+			} else {
+				parent = parent(subTree.Lchild, element);
+				// 在左子树中递归搜索element的父节点
+				return parent != null ? parent : parent(subTree.Rchild, element);
+				// 如果在左子树中找到了，就返回；没有找到，就在右子树中搜索
+				// 如果都没有找到，就返回null
+			}
+		}
+	}
+
+	public TreeNode<E> leftChild(TreeNode<E> node) {
+		if (node == null) {
+			return null;
+		}
+		return node.Lchild;
+	}
+
+	public TreeNode<E> rightChild(TreeNode<E> node) {
+		if (node == null) {
+			return null;
+		}
+		return node.Rchild;
 	}
 
 	public TreeNode<E> root() {
 		return this.root;
+	}
+
+	public void destroy() {
+		destory(root);
+		root = null;
+	}
+
+	// 销毁采用后序遍历
+	// 销毁时要先销毁左子树和右子树，最后将自身设为null，否则会出现空指针异常
+	private void destory(TreeNode<E> subTree) {
+		if (subTree != null) {
+			destory(subTree.Lchild);
+			destory(subTree.Rchild);
+			subTree = null;
+		}
+	}
+
+	// 清空应该每种遍历方式都可行，在这里采用先序遍历
+	public void clear(TreeNode<E> subTree) {
+		if (subTree != null) {
+			subTree.data = null;
+			clear(subTree.Lchild);
+			clear(subTree.Rchild);
+		}
 	}
 
 	public void preOrder(TreeNode<E> subTree) {
@@ -223,38 +176,6 @@ public class BiTree<E extends Comparable<E>> {
 		}
 	}
 
-	// 使用一个标记上一个访问结点的引用来实现非递归后序遍历
-	public void noRecPostOrder(TreeNode<E> subTree) {
-		Stack<TreeNode<E>> stack = new Stack<>();
-		TreeNode<E> lastVisited = null;
-		// 这里不需要加上while循环，因为当栈空的时候，就可知遍历已经结束，subTree又回到了根节点
-		while (subTree != null) {
-			stack.push(subTree);
-			subTree = subTree.Lchild;// 访问左子树
-		}
-		while (!stack.isEmpty()) {
-			// 在这里，可以保证已经遍历到左子树的底端
-			subTree = stack.pop();
-			// 回到当前结点
-			if (subTree.Rchild == null || subTree.Rchild == lastVisited) {
-				// 一个根节点被访问的前提是：无右子树或右子树已被访问过
-				System.out.print(subTree.data + " ");
-				lastVisited = subTree;
-			} else {
-				// 此时在左子树的底端，并且有右子树或者右子树尚未被访问，那么需要访问右子树
-				// 访问右子树之前也要入栈，以保证在访问完右子树后能回到当前结点访问数据域
-				stack.push(subTree);
-				subTree = subTree.Rchild;
-				// 进入右子树，并且可以保证右子树不为空，那么在右子树中继续进行后序遍历，先访问左子树直至左子树底端
-				// 之后就回到循环体的开始，检查右子树
-				while (subTree != null) {
-					stack.push(subTree);
-					subTree = subTree.Lchild;// 访问左子树
-				}
-			}
-		}
-	}
-
 	/**
 	 * 使用tag来标记是第几次访问 tag = 0 是尚未访问 tag = 1 是已经访问过，等待最后的打印
 	 * 
@@ -312,60 +233,38 @@ public class BiTree<E extends Comparable<E>> {
 		System.out.println();
 	}
 
-	// 使用先序遍历的字符串和中序遍历的字符串建树，不依赖于空白字符/特殊字符
-	// 只能创建存储字符的二叉树
-	public static BiTree<Character> preInCreateBiTree(String preStr, String inStr) {
-		char[] pre = preStr.toCharArray();
-		char[] in = inStr.toCharArray();
-		return new BiTree<>(createSubTree(pre, in, 0, 0, pre.length));
+	public int leafSize() {
+		return leafSize(root);
 	}
 
-	private static TreeNode<Character> createSubTree(char[] pre, char[] in, int preStart, int inStart, int size) {
-		if (size == 0) {
-			return null;
-		}
-		TreeNode<Character> subTree = new TreeNode<>(pre[preStart]);
-		int mid = indexOf(in, pre[preStart]);
-		if (mid != inStart) {
-			subTree.Lchild = createSubTree(pre, in, preStart + 1, inStart, mid - inStart);
-		}
-		// mid-inStart 为左子树的总数
-		if (mid != inStart + size - 1) {
-			// 两个if是为了跳过没有左子树或没有右子树的情况
-			// 没有右子树就是 右子树的开始就是结束 ； 开始是mid+1 ，当mid = inStart+size-1，则 开始为
-			// inStart+size，而结束也为它，所以没有必要创建右子树
-			subTree.Rchild = createSubTree(pre, in, preStart + 1 + (mid - inStart), mid + 1,
-					size - (mid - inStart) - 1);
-		}
-		// size - (mid -inStart) - 1)是右子树的总数，是所有结点总数size减去左子树的总数，再减去开头创建的根节点1个
-		return subTree;
-	}
-
-	public static BiTree<Character> preInCreateBiTreeUseSubString(String pre, String in) {
-		return new BiTree<Character>(createSubTreeUseSubString(pre, in));
-	}
-
-	// 这个算法更好，不使用下标，直接取子串
-	private static TreeNode<Character> createSubTreeUseSubString(String pre, String in) {
-		TreeNode<Character> subTree = null;
-		if (pre.length() == 0) {
-			return null;
+	private int leafSize(TreeNode<E> subTree) {
+		if (subTree == null) {
+			return 0;
+		} else if (subTree.Lchild == null && subTree.Rchild == null) {
+			return 1;
 		} else {
-			subTree = new TreeNode<>(pre.charAt(0));
-			int mid = in.indexOf(pre.charAt(0));
-			subTree.Lchild = createSubTreeUseSubString(pre.substring(1, mid + 1), in.substring(0, mid));
-			subTree.Rchild = createSubTreeUseSubString(pre.substring(mid + 1), in.substring(mid + 1));
+			// 如果不是叶子结点，那么分别求左子树的叶子结点和右子树的叶子结点，相加后返回
+			return leafSize(subTree.Lchild) + leafSize(subTree.Rchild);
 		}
-		return subTree;
 	}
 
-	private static int indexOf(char[] arr, char ch) {
-		for (int i = 0; i < arr.length; i++) {
-			if (ch == arr[i]) {
-				return i;
-			}
+	// 二叉树的复制，返回整棵一模一样的二叉树
+	// 采用先序遍历的方式
+	public BiTree<E> clone() {
+		BiTree<E> tree = new BiTree<>();
+		tree.root = clone(root);
+		return tree;
+	}
+
+	private TreeNode<E> clone(TreeNode<E> subTree) {
+		if (subTree != null) {
+			TreeNode<E> newNode = new TreeNode<>(subTree.data);
+			newNode.Lchild = clone(subTree.Lchild);
+			newNode.Rchild = clone(subTree.Rchild);
+			return newNode;
+		} else {
+			return null;
 		}
-		return -1;
 	}
 
 	// 使用先序遍历字符串建树，只能创建存储字符的二叉树
@@ -387,66 +286,49 @@ public class BiTree<E extends Comparable<E>> {
 		return subTree;
 	}
 
-	public int countLeaf() {
-		return countLeaf(root);
+	// 输出二叉树从根节点到每个叶子结点的路径
+	public void printAllBiTreePaths() {
+		if (pathList == null) {
+			pathList = new LinkedList<>();
+		}
+		printBiTreePath(root);
+		pathList.clear();
 	}
 
-	private int countLeaf(TreeNode<E> node) {
-		if (node == null) {
-			return 0;
-		} else if (node.Lchild == null && node.Rchild == null) {
-			return 1;
+	private void printBiTreePath(TreeNode<E> node) {
+		if (node != null) {
+			pathList.addLast(node);
+			if (node.Lchild == null && node.Rchild == null) {
+				for (TreeNode<E> treeNode : pathList) {
+					System.out.print(treeNode.data + " ");
+				}
+				System.out.println();
+				// 输出链表从根节点到叶子的数据域
+			} else {
+				printBiTreePath(node.Lchild);
+				printBiTreePath(node.Rchild);
+			}
+			pathList.removeLast();
+			// 处理完当前结点，退出链表
+		}
+	}
+
+	public static BiTree<Character> preInCreateBiTreeUseSubString(String pre, String in) {
+		return new BiTree<Character>(createSubTreeUseSubString(pre, in));
+	}
+
+	// 这个算法更好，不使用下标，直接取子串
+	private static TreeNode<Character> createSubTreeUseSubString(String pre, String in) {
+		TreeNode<Character> subTree = null;
+		if (pre.length() == 0) {
+			return null;
 		} else {
-			return countLeaf(node.Lchild) + countLeaf(node.Rchild);
+			subTree = new TreeNode<>(pre.charAt(0));
+			int mid = in.indexOf(pre.charAt(0));
+			subTree.Lchild = createSubTreeUseSubString(pre.substring(1, mid + 1), in.substring(0, mid));
+			subTree.Rchild = createSubTreeUseSubString(pre.substring(mid + 1), in.substring(mid + 1));
 		}
-	}
-	
-	public void swapChild(){
-		swapChild(root);
-	}
-	
-	private void swapChild(TreeNode<E> node){
-		if(node == null){
-			return;
-		}
-		TreeNode<E> temp = node.Rchild;
-		node.Rchild = node.Lchild;
-		node.Lchild = temp;
-		swapChild(node.Lchild);
-		swapChild(node.Rchild);
-	}
-	
-	public boolean isBST(TreeNode<E> node){
-		if(node == null){
-			return true;
-		}
-		if(node.Lchild != null && node.data.compareTo(node.Lchild.data) > 0 ){
-			return false;
-		}
-		if(node.Rchild != null && node.data.compareTo(node.Rchild.data) > 0){
-			return false;
-		}
-		return isBST(node.Lchild) && isBST(node.Rchild);
-	}
-	
-	
-	public static void main(String[] args) {
-//		BiTree<Character> tree = BiTree.createBiTree("ABD###CE#G##FH##I##");
-//		tree.levelOrder();
-		// tree.noRecPostOrderUseTag(tree.root);
-		// BiTree<Character> tree =
-		BiTree<Character> tree = BiTree.preInCreateBiTreeUseSubString("ABDCEGFHI", "DBAGECHFI");
-		// tree.levelOrder();
-//		System.out.println("\n"+tree.countLeaf());
-//		tree.swapChild();
-//		System.out.println();
-//		tree.levelOrder();
-		
-		tree.preOrder(tree.root);
-		System.out.println();
-		tree.inOrder(tree.root);
-		System.out.println();
-		tree.postOrder(tree.root);
+		return subTree;
 	}
 }
 

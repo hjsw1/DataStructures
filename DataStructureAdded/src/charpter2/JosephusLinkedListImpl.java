@@ -38,7 +38,7 @@ public class JosephusLinkedListImpl {
 					backupTail = ptr.next;
 				}
 				//删除下一个结点
-				ptr.next = backupTail.next;
+				ptr.next = ptr.next.next;
 				//删掉的也要计数
 				count++;
 			}
@@ -55,6 +55,7 @@ public class JosephusLinkedListImpl {
 	public int getLast(){
 		return backupTail.data;
 	}
+	
 	public void printSequence(){
 		Node ptr = backupHead;
 		while(ptr != null){

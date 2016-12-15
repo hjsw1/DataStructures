@@ -10,6 +10,7 @@ package priorityqueue;
  * @date 2016年11月28日 下午2:11:53
  *
  */
+
 @SuppressWarnings("all")
 public class MaxPriorityQueue<E extends Comparable<E>> {
 	private Object[] data;
