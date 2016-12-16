@@ -91,7 +91,7 @@ public class MetrixGraph<E extends Comparable<E>> {
 	public static final int infinity = java.lang.Integer.MAX_VALUE;// 表示网中的无限
 	private static final int hasJoined = 0;
 	private static final int noVisited = -1;
-	
+
 	private List<Vertex<E>> vexs; // 顶点
 	private ArcCell[][] arcs; // 邻接矩阵
 	private int vexNum, arcNum; // 图的当前顶点数和弧数
@@ -104,7 +104,6 @@ public class MetrixGraph<E extends Comparable<E>> {
 	private int mid;// mid记录当前顶点能够达到的最小序号值，用于求关节点
 
 	private LinkedList<String> path;
-	private List<Closedge> closedge;// 用于生成最小生成树的辅助数组
 
 	private int[] degree;// 保存了每个顶点的入度（有向图），用于拓扑排序；也可以保存每个结点的度（无向图）
 
@@ -112,12 +111,11 @@ public class MetrixGraph<E extends Comparable<E>> {
 		this.vexs = new ArrayList<>(MAX_VERTEX_NUM);
 		this.arcs = new ArcCell[MAX_VERTEX_NUM][MAX_VERTEX_NUM];
 		this.visited = new boolean[MAX_VERTEX_NUM];
-		
+
 		this.visitOrder = new int[MAX_VERTEX_NUM];
 		this.low = new int[MAX_VERTEX_NUM];
-		this.closedge = new ArrayList<>(MAX_VERTEX_NUM);
 		this.degree = new int[MAX_VERTEX_NUM];
-		
+
 		this.kind = kind;
 		this.vexNum = vexNum;
 		this.arcNum = arcNum;
@@ -780,23 +778,25 @@ public class MetrixGraph<E extends Comparable<E>> {
 	// closedge中的lowCost值为hasJoined表示该条边已经被加入到最小生成树中
 	public void miniSpanTreeOfPrim() {
 		int vexIndex = 0;
-		closedge.add(new Closedge(0, hasJoined));
+		List<Closedge> closedges = new ArrayList<>(this.vexNum);
+		closedges.add(new Closedge(0, hasJoined));
 		// 第0个顶点（开始的顶点）加入到最小生成树
 		System.out.println("起始顶点为" + this.vexs.get(vexIndex));
 		for (int i = 1; i < vexNum; i++) {
-			closedge.add(new Closedge(i, arcs[vexIndex][i].adj));
+			closedges.add(new Closedge(i, arcs[vexIndex][i].adj));
 		}
 		// 此时closedge保存了与第0个顶点相邻的邻接点以及它们之间边的权值
 		// 每次循环加入一条边
 		for (int i = 1; i < vexNum; i++) {
-			vexIndex = minWeightIndex(closedge);
-			System.out.println("建立边:顶点为" + vexs.get(vexIndex) + ",权值为" + closedge.get(vexIndex).lowCost);
-			closedge.get(vexIndex).lowCost = hasJoined;
+			vexIndex = minWeightIndex(closedges);
+			// System.out.println("建立边:顶点为" + vexs.get(vexIndex) + ",权值为" +
+			// closedge.get(vexIndex).lowCost);
+			closedges.get(vexIndex).lowCost = hasJoined;
 			// 当前的最小权值的边已经加入，需要在辅助数组中添加当前新增顶点所连接的边
 			for (int j = 0; j < vexNum; j++) {
-				if (arcs[vexIndex][j].adj < closedge.get(j).lowCost) {
-					closedge.get(j).lowCost = arcs[vexIndex][j].adj;
-					closedge.get(j).vexIndex = vexIndex;
+				if (arcs[vexIndex][j].adj < closedges.get(j).lowCost) {
+					closedges.get(j).lowCost = arcs[vexIndex][j].adj;
+					closedges.get(j).vexIndex = vexIndex;
 				}
 			}
 			// for循环结束后，closedge新增了 新的vexIndex的边的最小权值的边，但同时保留了以往的边（前提是权值没有更小的）
@@ -805,14 +805,14 @@ public class MetrixGraph<E extends Comparable<E>> {
 
 	// 获得辅助数组中权值最小的边所对应的顶点索引
 	// 不可能返回0，起码要>=1
-	private int minWeightIndex(List<Closedge> closedge) {
+	private int minWeightIndex(List<Closedge> closedges) {
 		int vexIndex = 1;
 		int minWeight = java.lang.Integer.MAX_VALUE;
 		for (int i = 1; i < vexNum; i++) {
 			// 权值不能为hasJoined，也就是这条边尚未加入到最小生成树中
-			if (closedge.get(i).lowCost != hasJoined && minWeight > closedge.get(i).lowCost) {
+			if (closedges.get(i).lowCost != hasJoined && minWeight > closedges.get(i).lowCost) {
 				vexIndex = i;
-				minWeight = closedge.get(i).lowCost;
+				minWeight = closedges.get(i).lowCost;
 			}
 		}
 		return vexIndex;
@@ -835,7 +835,6 @@ public class MetrixGraph<E extends Comparable<E>> {
 		public int compareTo(MetrixGraph<E>.Edge edge) {
 			return weight - edge.weight;
 		}
-
 	}
 
 	// 最小生成树的Kruskal算法
@@ -997,20 +996,20 @@ public class MetrixGraph<E extends Comparable<E>> {
 
 	// Dijkstra算法求最短路径
 	public String[] shortestPathOfDijkstra(Vertex<E> source) {
-		int sourceIndex = locateVertex(source.getData());
-		if (sourceIndex == -1) {
+		int srcIndex = locateVertex(source.getData());
+		if (srcIndex == -1) {
 			return null;
 		}
 		String[] path = new String[vexNum];
 		int[] distance = new int[vexNum];
 		for (int i = 0; i < vexNum; i++) {
 			visited[i] = false;
-			distance[i] = arcs[sourceIndex][i].adj;
-			path[i] = vexs.get(sourceIndex) + "-" + vexs.get(i);
+			distance[i] = arcs[srcIndex][i].adj;
+			path[i] = vexs.get(srcIndex) + "-" + vexs.get(i);
 		}
 		// 使用visited数组来表示每个顶点是否被选择
 		// path数组默认值设置为源点到当前顶点，因为有可能这就是最终结果
-		visited[sourceIndex] = true;
+		visited[srcIndex] = true;
 		// 此时distance存储的是从源点伸出的弧的权值，不存在的弧权值为infinity
 		// 开始主循环，每次循环向结果中加入一个顶点
 		int minWeight = infinity;
@@ -1068,7 +1067,7 @@ public class MetrixGraph<E extends Comparable<E>> {
 						// 自己至自己的就不必修改了
 						// 中间顶点是起点或终点的也不必修改
 						// 要求起点到中间顶点和中间顶点到终点的弧都存在
-						if (i != j && j != midVex && weight[i][midVex] != infinity && weight[midVex][j] != infinity
+						if (i != j && weight[i][midVex] != infinity && weight[midVex][j] != infinity
 								&& (weight[i][j] == infinity
 										|| (weight[i][midVex] + weight[midVex][j] < weight[i][j]))) {
 							weight[i][j] = weight[i][midVex] + weight[midVex][j];
@@ -1116,8 +1115,8 @@ public class MetrixGraph<E extends Comparable<E>> {
 			// 栈空时表示没有顶点入度为0了，此时有两种情况，一种是找不到入度为0的点，另一种是排序完毕
 			// 先随意取出一个顶点，将其所有邻接点的入度-1
 			index = stack.pop();
-			vexCount++;
 			System.out.print(vexs.get(index) + " ");
+			vexCount++;
 			for (int i = firstAdjVex(index); i != -1; i = nextAdjVex(index, i)) {
 				degree[i]--;
 				if (degree[i] == 0) {
@@ -1136,29 +1135,30 @@ public class MetrixGraph<E extends Comparable<E>> {
 	// 前半部分是修改过的拓扑排序，后半部分是拓扑倒序遍历。
 	public String criticalPath() {
 		initInDegree();
-		Stack<Integer> inDegreeStack = new Stack<>();// 入度为0的栈
-		Stack<Integer> vexSeqStack = new Stack<>();// 拓扑序列顶点栈
-		int[] earliestTime = new int[vexNum];// 最早开始时间数组
-		int[] latestTime = new int[vexNum];// 最晚开始时间数组
+		Stack<Integer> degreeStack = new Stack<>();// 入度为0的栈
+		Stack<Integer> vexStack = new Stack<>();// 拓扑序列顶点栈
+		int[] earliest = new int[vexNum];// 最早开始时间数组
+		int[] latest = new int[vexNum];// 最晚开始时间数组
 
 		for (int i = 0; i < vexNum; i++) {
 			if (degree[i] == 0) {
-				inDegreeStack.push(i);
+				degreeStack.push(i);
 			}
 		}
+		
 		int index = 0;// 执行当前顶点
 		int vexCount = 0;
-		while (!inDegreeStack.isEmpty()) {
-			index = inDegreeStack.pop();
-			vexSeqStack.push(index);
+		while (!degreeStack.isEmpty()) {
+			index = degreeStack.pop();
+			vexStack.push(index);
 			vexCount++;
 			for (int i = firstAdjVex(index); i != -1; i = nextAdjVex(index, i)) {
 				degree[i]--;
 				if (degree[i] == 0) {
-					inDegreeStack.push(i);
+					degreeStack.push(i);
 				}
-				if (earliestTime[index] + arcs[index][i].adj > earliestTime[i]) {
-					earliestTime[i] = earliestTime[index] + arcs[index][i].adj;
+				if (earliest[index] + arcs[index][i].adj > earliest[i]) {
+					earliest[i] = earliest[index] + arcs[index][i].adj;
 					// 取得最大值
 					// 注意i的最早开始时间是在当前顶点为index的时候求得的
 				}
@@ -1168,24 +1168,27 @@ public class MetrixGraph<E extends Comparable<E>> {
 			return null;
 		}
 		for (int i = 0; i < vexNum; i++) {
-			latestTime[i] = earliestTime[vexNum - 1];
+			latest[i] = earliest[vexNum - 1];
 		}
+		
+		
 		// 最晚开始时间全部赋为最后一个最早开始时间，以备后面的相减
-		while (!vexSeqStack.isEmpty()) {
-			index = vexSeqStack.pop();
+		while (!vexStack.isEmpty()) {
+			index = vexStack.pop();
 			for (int i = firstAdjVex(index); i != -1; i = nextAdjVex(index, i)) {
 				// 从后往前，访问每个顶点
 				// 主要目的是求出latestTime的值
-				if (latestTime[i] - arcs[index][i].adj < latestTime[index]) {
-					latestTime[index] = latestTime[i] - arcs[index][i].adj;
+				if (latest[i] - arcs[index][i].adj < latest[index]) {
+					latest[index] = latest[i] - arcs[index][i].adj;
 					// 取得最小值
 					// index的最晚开始时间就是在当前顶点为index的时候求得的
 				}
 			}
 		}
+		
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < vexNum; i++) {
-			if (earliestTime[i] == latestTime[i]) {
+			if (earliest[i] == latest[i]) {
 				sb.append(vexs.get(i));
 				if (i != vexNum - 1) {
 					sb.append("-");
@@ -1194,5 +1197,37 @@ public class MetrixGraph<E extends Comparable<E>> {
 		}
 		return sb.toString();
 
+	}
+
+	public static void main(String[] args) {
+		String[] data2 = { "v1", "v2", "v3", "v4" };
+		String[] tail2 = { "v1", "v1", "v3", "v4" };
+		String[] head2 = { "v2", "v3", "v4", "v1" };
+		int[] weight = { 3, 5, 6, 9 };
+		MetrixGraph<String> graph2 = MetrixGraph.createGraph(GraphKind.DN, data2, tail2, head2, weight, null);
+		graph2.display();
+		System.out.println("--------------------");
+		graph2.deleteVex(new Vertex<>("v3"));
+		graph2.display();
+		graph2.insertVex(new Vertex<>("v5"));
+		graph2.insertArc(new Vertex<>("v5"), new Vertex<>("v4"), 23, null);
+		graph2.insertArc(new Vertex<>("v4"), new Vertex<>("v5"), 12, null); // graph.destroy();
+		graph2.display();
+
+		System.out.println(graph2.firstAdjVex(new Vertex<>("v1")));
+		System.out.println(graph2.firstAdjVex(new Vertex<>("v2")));
+		System.out.println(graph2.firstAdjVex(new Vertex<>("v5")));
+		System.out.println("------------------");
+		System.out.println(graph2.nextAdjVex(new Vertex<>("v1"), new Vertex<>("v3")));
+		System.out.println(graph2.nextAdjVex(new Vertex<>("v4"), new Vertex<>("v1")));
+		System.out.println(graph2.nextAdjVex(new Vertex<>("v1"), new Vertex<>("v4")));
+		System.out.println("-------------------");
+		graph2.putVertex(new Vertex<>("v5"), "v7");
+		graph2.display();
+		System.out.println(graph2.getVertex(new Vertex<>("v7")));
+		graph2.deleteArc(new Vertex<>("v1"), new Vertex<>("v3"));
+		graph2.display();
+		graph2.deleteArc(new Vertex<>("v2"), new Vertex<>("v4"));
+		graph2.display();
 	}
 }
